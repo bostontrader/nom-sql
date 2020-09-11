@@ -42,7 +42,6 @@ mod compound_select;
 mod condition;
 mod create;
 mod delete;
-mod drop;
 mod insert;
 mod join;
 mod order;
