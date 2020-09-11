@@ -11,7 +11,7 @@ use arithmetic::{arithmetic_expression, ArithmeticExpression};
 use case::case_when_column;
 use column::{Column, FunctionArguments, FunctionExpression};
 use keywords::{escape_if_keyword, sql_keyword};
-use nom::bytes::complete::{is_not, tag, tag_no_case, take, take_until, take_while1};
+use nom::bytes::complete::{is_not, tag, tag_no_case, take, take_while1};
 use nom::combinator::opt;
 use nom::error::{ErrorKind, ParseError};
 use nom::multi::{fold_many0, many0, many1};
@@ -796,7 +796,7 @@ pub(crate) fn ws_sep_comma(i: &[u8]) -> IResult<&[u8], &[u8]> {
     delimited(multispace0, tag(","), multispace0)(i)
 }
 
-pub(crate) fn ws_sep_equals<'a, I>(i: I) -> IResult<I, I>
+/*pub(crate) fn ws_sep_equals<'a, I>(i: I) -> IResult<I, I>
 where
     I: nom::InputTakeAtPosition + nom::InputTake + nom::Compare<&'a str>,
     // Compare required by tag
@@ -804,7 +804,7 @@ where
     // AsChar and Clone required by multispace0
 {
     delimited(multispace0, tag("="), multispace0)(i)
-}
+}*/
 
 pub fn assignment_expr_list(i: &[u8]) -> IResult<&[u8], Vec<(Column, FieldValueExpression)>> {
     many1(terminated(assignment_expr, opt(ws_sep_comma)))(i)
@@ -971,17 +971,6 @@ pub fn table_reference(i: &[u8]) -> IResult<&[u8], Table> {
     })(i)
 }
 
-// Parse rule for a comment part.
-pub fn parse_comment(i: &[u8]) -> IResult<&[u8], String> {
-    map(
-        preceded(
-            delimited(multispace0, tag_no_case("comment"), multispace1),
-            delimited(tag("'"), take_until("'"), tag("'")),
-        ),
-        |comment| String::from(str::from_utf8(comment).unwrap()),
-    )(i)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1039,12 +1028,6 @@ mod tests {
             ))),
         };
         assert_eq!(res.unwrap().1, expected);
-    }
-
-    #[test]
-    fn comment_data() {
-        let res = parse_comment(b" COMMENT 'test'");
-        assert_eq!(res.unwrap().1, "test");
     }
 
     #[test]
