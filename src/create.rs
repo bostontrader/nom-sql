@@ -1,20 +1,12 @@
-use nom::character::complete::{multispace1};
 use std::fmt;
 use std::str;
 
 use column::{Column, ColumnSpecification};
-use common::{
-    sql_identifier, statement_terminator, TableKey,
-};
-use compound_select::{compound_selection, CompoundSelectStatement};
+use common::{TableKey};
+use compound_select::{CompoundSelectStatement};
 //use create_table_options::table_options;
 use keywords::escape_if_keyword;
-use nom::branch::alt;
-use nom::bytes::complete::{tag_no_case};
-use nom::combinator::{map};
-use nom::sequence::{tuple};
-use nom::IResult;
-use select::{nested_selection, SelectStatement};
+use select::{SelectStatement};
 use table::Table;
 
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq, Serialize, Deserialize)]
@@ -93,37 +85,3 @@ impl fmt::Display for CreateViewStatement {
         write!(f, "{}", self.definition)
     }
 }
-
-
-// Parse rule for a SQL CREATE VIEW query.
-pub fn view_creation(i: &[u8]) -> IResult<&[u8], CreateViewStatement> {
-    let (remaining_input, (_, _, _, _, name_slice, _, _, _, def, _)) = tuple((
-        tag_no_case("create"),
-        multispace1,
-        tag_no_case("view"),
-        multispace1,
-        sql_identifier,
-        multispace1,
-        tag_no_case("as"),
-        multispace1,
-        alt((
-            map(compound_selection, |s| SelectSpecification::Compound(s)),
-            map(nested_selection, |s| SelectSpecification::Simple(s)),
-        )),
-        statement_terminator,
-    ))(i)?;
-
-    let name = String::from_utf8(name_slice.to_vec()).unwrap();
-    let fields = vec![]; // TODO(malte): support
-    let definition = Box::new(def);
-
-    Ok((
-        remaining_input,
-        CreateViewStatement {
-            name,
-            fields,
-            definition,
-        },
-    ))
-}
-
