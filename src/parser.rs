@@ -2,7 +2,7 @@ use std::fmt;
 use std::str;
 
 use compound_select::{compound_selection, CompoundSelectStatement};
-use create::{creation, view_creation, CreateTableStatement, CreateViewStatement};
+use create::{view_creation, CreateViewStatement};
 use delete::{deletion, DeleteStatement};
 use drop::{drop_table, DropTableStatement};
 use insert::{insertion, InsertStatement};
@@ -15,7 +15,7 @@ use update::{updating, UpdateStatement};
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub enum SqlQuery {
-    CreateTable(CreateTableStatement),
+    // CreateTable(CreateTableStatement),
     CreateView(CreateViewStatement),
     Insert(InsertStatement),
     CompoundSelect(CompoundSelectStatement),
@@ -31,7 +31,7 @@ impl fmt::Display for SqlQuery {
         match *self {
             SqlQuery::Select(ref select) => write!(f, "{}", select),
             SqlQuery::Insert(ref insert) => write!(f, "{}", insert),
-            SqlQuery::CreateTable(ref create) => write!(f, "{}", create),
+            //SqlQuery::CreateTable(ref create) => write!(f, "{}", create),
             SqlQuery::CreateView(ref create) => write!(f, "{}", create),
             SqlQuery::Delete(ref delete) => write!(f, "{}", delete),
             SqlQuery::DropTable(ref drop) => write!(f, "{}", drop),
@@ -44,7 +44,7 @@ impl fmt::Display for SqlQuery {
 
 pub fn sql_query(i: &[u8]) -> IResult<&[u8], SqlQuery> {
     alt((
-        map(creation, |c| SqlQuery::CreateTable(c)),
+        //map(creation, |c| SqlQuery::CreateTable(c)),
         map(insertion, |i| SqlQuery::Insert(i)),
         map(compound_selection, |cs| SqlQuery::CompoundSelect(cs)),
         map(selection, |s| SqlQuery::Select(s)),
