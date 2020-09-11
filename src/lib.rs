@@ -19,14 +19,13 @@ pub use self::common::{
 };
 pub use self::compound_select::{CompoundSelectOperator, CompoundSelectStatement};
 pub use self::condition::{ConditionBase, ConditionExpression, ConditionTree};
-pub use self::create::{CreateTableStatement, CreateViewStatement, SelectSpecification};
+pub use self::create::{SelectSpecification};
 pub use self::delete::DeleteStatement;
 pub use self::insert::InsertStatement;
 pub use self::join::{JoinConstraint, JoinOperator, JoinRightSide};
 pub use self::order::{OrderClause, OrderType};
 pub use self::parser::*;
 pub use self::select::{GroupByClause, JoinClause, LimitClause, SelectStatement};
-pub use self::set::SetStatement;
 pub use self::table::Table;
 pub use self::update::UpdateStatement;
 
@@ -46,6 +45,5 @@ mod insert;
 mod join;
 mod order;
 mod select;
-mod set;
 mod table;
 mod update;

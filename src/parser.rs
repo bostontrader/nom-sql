@@ -8,20 +8,15 @@ use nom::branch::alt;
 use nom::combinator::map;
 use nom::IResult;
 use select::{selection, SelectStatement};
-use set::{set, SetStatement};
 use update::{updating, UpdateStatement};
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub enum SqlQuery {
-    // CreateTable(CreateTableStatement),
-    //CreateView(CreateViewStatement),
     Insert(InsertStatement),
     CompoundSelect(CompoundSelectStatement),
     Select(SelectStatement),
     Delete(DeleteStatement),
-    //DropTable(DropTableStatement),
     Update(UpdateStatement),
-    Set(SetStatement),
 }
 
 impl fmt::Display for SqlQuery {
@@ -29,12 +24,8 @@ impl fmt::Display for SqlQuery {
         match *self {
             SqlQuery::Select(ref select) => write!(f, "{}", select),
             SqlQuery::Insert(ref insert) => write!(f, "{}", insert),
-            //SqlQuery::CreateTable(ref create) => write!(f, "{}", create),
-            //SqlQuery::CreateView(ref create) => write!(f, "{}", create),
             SqlQuery::Delete(ref delete) => write!(f, "{}", delete),
-            //SqlQuery::DropTable(ref drop) => write!(f, "{}", drop),
             SqlQuery::Update(ref update) => write!(f, "{}", update),
-            SqlQuery::Set(ref set) => write!(f, "{}", set),
             _ => unimplemented!(),
         }
     }
@@ -47,10 +38,7 @@ pub fn sql_query(i: &[u8]) -> IResult<&[u8], SqlQuery> {
         map(compound_selection, |cs| SqlQuery::CompoundSelect(cs)),
         map(selection, |s| SqlQuery::Select(s)),
         map(deletion, |d| SqlQuery::Delete(d)),
-        //map(drop_table, |dt| SqlQuery::DropTable(dt)),
         map(updating, |u| SqlQuery::Update(u)),
-        map(set, |s| SqlQuery::Set(s)),
-        //map(view_creation, |vc| SqlQuery::CreateView(vc)),
     ))(i)
 }
 
