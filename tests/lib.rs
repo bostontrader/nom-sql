@@ -98,3 +98,8 @@ fn test_queries_from_file(f: &Path, name: &str) -> Result<i32, i32> {
     // Try parsing them all
     parse_queryset(queries)
 }*/
+
+//#[test]
+//fn white_list() {
+//    assert!(test_queries_from_file(Path::new("tests/white-list.txt"), "White List").is_ok());
+//}
