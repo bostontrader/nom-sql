@@ -298,7 +298,6 @@ pub enum FieldDefinitionExpression {
     All,
     AllInTable(String),
     Col(Column),
-    Value(FieldValueExpression),
 }
 
 impl Display for FieldDefinitionExpression {
@@ -309,7 +308,6 @@ impl Display for FieldDefinitionExpression {
                 write!(f, "{}.*", escape_if_keyword(table))
             }
             FieldDefinitionExpression::Col(ref col) => write!(f, "{}", col),
-            FieldDefinitionExpression::Value(ref val) => write!(f, "{}", val),
         }
     }
 }
@@ -823,12 +821,6 @@ pub fn field_definition_expr(i: &[u8]) -> IResult<&[u8], Vec<FieldDefinitionExpr
             map(terminated(table_reference, tag(".*")), |t| {
                 FieldDefinitionExpression::AllInTable(t.name.clone())
             }),
-            map(arithmetic_expression, |expr| {
-                FieldDefinitionExpression::Value(FieldValueExpression::Arithmetic(expr))
-            }),
-            map(literal_expression, |lit| {
-                FieldDefinitionExpression::Value(FieldValueExpression::Literal(lit))
-            }),
             map(column_identifier, |col| FieldDefinitionExpression::Col(col)),
         )),
         opt(ws_sep_comma),
@@ -939,19 +931,6 @@ pub fn literal(i: &[u8]) -> IResult<&[u8], Literal> {
         map(tag_no_case("current_time"), |_| Literal::CurrentTime),
         map(tag("?"), |_| Literal::Placeholder),
     ))(i)
-}
-
-pub fn literal_expression(i: &[u8]) -> IResult<&[u8], LiteralExpression> {
-    map(
-        pair(
-            delimited(opt(tag("(")), literal, opt(tag(")"))),
-            opt(as_alias),
-        ),
-        |p| LiteralExpression {
-            value: p.0,
-            alias: (p.1).map(|a| a.to_string()),
-        },
-    )(i)
 }
 
 // Parse a list of values (e.g., for INSERT syntax).
